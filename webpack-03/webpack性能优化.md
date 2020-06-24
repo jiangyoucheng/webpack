@@ -195,3 +195,70 @@ module.exports = {
 }
 ``````
 
+
+
+## development vs production 模式区分打包
+
+将生产环境和开发环境分开配置。
+
+``````javascript
+// webpack.config.common.js
+module.exports = {
+    // 公共配置
+}
+
+// webpack.config.dev.js
+const merge = require("webpack-merge")
+const commonConfig = require("./webpack.config.common.js")
+const devConfig = {
+    // 开发环境配置
+}
+
+module.exports = merge(commonConfig, devConfig)
+
+// webpack.config.pro.js
+const merge = require("webpack-merge")
+const commonConfig = require("./webpack.config.common.js")
+const proConfig = {
+    // 生产环境配置
+}
+
+module.exports = merge(commonConfig, proConfig)
+
+// package.js
+"scripts": {
+    "dev": "webpack-dev-server --config ./webpack.config.dev.js",
+    "build": "webpack --config ./webpack.config.pro.js"
+}
+``````
+
+### 基于环境变量区分
+
+* 借助cross-env
+
+``````
+npm install cross-env -D
+``````
+
+* package里面配置命令脚本，传入参数
+
+``````json
+"test": "cross-env NODE_ENV=test webpack --config ./webpack.config.test.js"
+``````
+
+* 在webpack.config.js里拿到参数
+
+``````javascript
+process.env.NODE_ENV
+``````
+
+``````javascript
+module.exports = env => {
+    if(env && env.production) {
+        return merge(commonConfig, proConfig)
+    } else {
+        return merge(commonConfig, devConfig)
+    }
+}
+``````
+
